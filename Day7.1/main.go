@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 
@@ -25,4 +26,24 @@ func main() {
 		pos, _ := strconv.Atoi(scanner.Text())
 		positions = append(positions, pos)
 	}
+
+	analysis := make(map[int]int)
+	for _, origin := range positions {
+		if _, found := analysis[origin]; found {
+			continue
+		}
+
+		for _, pos := range positions {
+			analysis[origin] += int(math.Abs(float64(origin - pos)))
+		}
+	}
+
+	var minimumFuel int
+	for _, f := range analysis {
+		if minimumFuel == 0 || f < minimumFuel {
+			minimumFuel = f
+		}
+	}
+
+	fmt.Println(minimumFuel)
 }
