@@ -8,8 +8,11 @@ import (
 	"strings"
 )
 
+// Had to get help on this one.  This problem gets me every year.
+// https://github.com/lynerist/Advent-of-code-2021-golang/blob/master/Day_06/day06_b.go
+
 func main() {
-	file, err := os.Open("./Day6.2/input_test.txt")
+	file, err := os.Open("./Day6.2/input.txt")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -17,51 +20,31 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	scanner.Split(split)
+	scanner.Scan()
 
-	fishes := make([]int, 0)
-	for scanner.Scan() {
-		timer, _ := strconv.Atoi(scanner.Text())
-		fishes = append(fishes, timer)
+	fishes := scanner.Text()
+	var lanternFishByAge [9]int
+
+	for _, fish := range strings.Split(fishes, ",") {
+		days, _ := strconv.Atoi(fish)
+		lanternFishByAge[days]++
 	}
 
-	newFish := make([]int, 0)
+	for evolution := 0; evolution < 256; evolution++ {
+		justBred := lanternFishByAge[0]
 
-	for day := 1; day <= 256; day++ {
-		fishes = append(fishes, newFish...)
-		newFish = make([]int, 0)
-
-		for i := range fishes {
-			if fishes[i] == 0 {
-				fishes[i] = 6
-			} else {
-				fishes[i]--
-			}
-
-			if fishes[i] == 0 {
-				newFish = append(newFish, 9)
-			}
+		for days := range lanternFishByAge[:len(lanternFishByAge)-1] {
+			lanternFishByAge[days] = lanternFishByAge[days+1]
 		}
+
+		lanternFishByAge[6] += justBred
+		lanternFishByAge[8] = justBred
 	}
 
-	fmt.Printf("Total fish after 80 days is %d\n", len(fishes))
-}
-
-func split(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	// Return nothing if at end of file and no data passed
-	if atEOF && len(data) == 0 {
-		return 0, nil, nil
+	var fishCount int
+	for _, fishes := range lanternFishByAge {
+		fishCount += fishes
 	}
 
-	// Find the index of the input where a comma is present.
-	if i := strings.Index(string(data), ","); i >= 0 {
-		return i + 1, data[0:i], nil
-	}
-
-	// If at end of file with data return the data
-	if atEOF {
-		return len(data), data, nil
-	}
-
-	return
+	fmt.Println(fishCount)
 }
