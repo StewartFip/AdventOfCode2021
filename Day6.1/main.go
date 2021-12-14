@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
+
+	"github.com/StewartFip/AdventOfCode2021/lib"
 )
 
 func main() {
@@ -17,7 +18,7 @@ func main() {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	scanner.Split(split)
+	scanner.Split(lib.SplitCSV)
 
 	fishes := make([]int, 0)
 	for scanner.Scan() {
@@ -45,23 +46,4 @@ func main() {
 	}
 
 	fmt.Printf("Total fish after 80 days is %d\n", len(fishes))
-}
-
-func split(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	// Return nothing if at end of file and no data passed
-	if atEOF && len(data) == 0 {
-		return 0, nil, nil
-	}
-
-	// Find the index of the input where a comma is present.
-	if i := strings.Index(string(data), ","); i >= 0 {
-		return i + 1, data[0:i], nil
-	}
-
-	// If at end of file with data return the data
-	if atEOF {
-		return len(data), data, nil
-	}
-
-	return
 }
